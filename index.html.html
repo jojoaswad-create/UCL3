@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Champions League Draft</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;600;800&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef0e4;--ink:#17301f;--mut:#5d6f60;--line:#c9d1bd;--card:#f8f9f1;--acc:#c9560f;--goal:#17301f;--goalfg:#eef0e4;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f2117;--ink:#e8eddc;--mut:#98a995;--line:#2a4433;--card:#16301f;--acc:#f2b632;--goal:#e8eddc;--goalfg:#0f2117;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f2117;--ink:#e8eddc;--mut:#98a995;--line:#2a4433;--card:#16301f;--acc:#f2b632;--goal:#e8eddc;--goalfg:#0f2117;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Bricolage Grotesque",system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(34px,8vw,56px);line-height:1;margin:8px 0 6px;font-weight:800;letter-spacing:-.03em;text-align:center}
+p.sub{color:var(--mut);margin:0 auto 20px;max-width:56ch;text-align:center}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 22px;justify-content:center}
+button, select{font:600 15px inherit;font-family:inherit;border:1px solid var(--ink);background:var(--card);color:var(--ink);border-radius:6px;padding:10px 14px;cursor:pointer}
+button.p{background:var(--ink);color:var(--bg)}
+button:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.setup-box{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:20px}
+.wheel-container{display:flex;justify-content:center;gap:20px;margin-bottom:10px}
+.wheel-col{display:flex;flex-direction:column;align-items:center;gap:6px;width:50%}
+.wheel-col span{font-size:13px;font-weight:600;color:var(--mut)}
+
+.slot-machine-box {
+    width: 100%;
+    max-width: 200px;
+    height: 70px;
+    background: var(--card);
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
+    display: block; 
+}
+.slot-reel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 3.5s cubic-bezier(0.15, 0.85, 0.15, 1);
+}
+.slot-item {
+    height: 70px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    text-align: center;
+    padding: 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--ink);
+}
+
+.field-view {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0,0,0,0.15);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    margin: 14px 0;
+}
+.field-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.slot{border:1px dashed var(--mut);border-radius:6px;padding:8px 4px;min-height:64px;width:85px;text-align:center;font-size:12px;color:var(--mut);display:flex;flex-direction:column;justify-content:center;align-items:center;background:var(--card);cursor:grab;user-select:none}
+.slot.f{border:2px solid var(--ink);color:var(--ink);background:var(--card)}
+.slot b{display:block;font-size:11px;line-height:1.2;opacity:0.8}
+.ovr-badge{background:var(--acc);color:#fff;font-size:10px;padding:1px 4px;border-radius:3px;margin-top:2px}
+
+.ro h3{margin:12px 0 4px;font-size:15px}.pk{display:flex;flex-wrap:wrap;gap:6px}.pk button{font-weight:400;text-align:start;padding:8px 10px;font-size:14px;flex:1;min-width:160px}.pk button small{display:block;color:var(--mut);font-size:11px;direction:ltr;text-align:start}
+.pk button:disabled{opacity:.35;cursor:not-allowed}.msg{margin:10px 0;font-weight:600;text-align:center;line-height:1.4}
+.tb{width:100%;border-collapse:collapse;font-size:15px}.tb td{padding:6px 4px;border-bottom:1px solid var(--line)}.tb tr.me{background:var(--card);font-weight:600}
+ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+li{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+li .m{color:var(--mut);font-variant-numeric:tabular-nums}
+details{margin-top:14px}summary{cursor:pointer;color:var(--mut);font-size:14px}
+:root:root:root{--bg:#070f2b;--ink:#eaf1ff;--mut:#8fa3d6;--line:#22366f;--card:#0e1b4a;--acc:#6fd3ff;--goal:#eaf1ff;--goalfg:#070f2b;color-scheme:dark}
+body{background:radial-gradient(ellipse at 50% -10%,#1b3a9a 0,transparent 55%),var(--bg)}
+.msg.big{font-size:20px;font-weight:800;text-align:center}
+.team-rating{font-size:26px;color:var(--acc);font-weight:800;display:block;margin-top:8px}
+</style>
+</head>
+<body><main>
+<h1>★ Champions League Draft</h1>
+<p class="sub">Select your formation, roll the slot machines to pick team and decade, build your squad, and drag & drop players!</p>
+
+<div class="setup-box">
+    <label for="formationSelect"><b>Formation:</b></label>
+    <select id="formationSelect">
+        <option value="4-3-3">4-3-3</option>
+        <option value="4-4-2">4-4-2</option>
+        <option value="4-1-4-1">4-1-4-1</option>
+        <option value="3-5-2">3-5-2</option>
+        <option value="3-4-3">3-4-3</option>
+        <option value="4-2-4">4-2-4</option>
+    </select>
+</div>
+
+<div class="wheel-container">
+    <div class="wheel-col">
+        <span>Team Slot <button id="respinTeamBtn" style="font-size:10px;padding:2px 4px;margin-right:4px;" onclick="respinSingle('T')">Re-spin (1)</button></span>
+        <div class="slot-machine-box"><div class="slot-reel" id="reelTeam"></div></div>
+    </div>
+    <div class="wheel-col">
+        <span>Decade Slot <button id="respinDecadeBtn" style="font-size:10px;padding:2px 4px;margin-right:4px;" onclick="respinSingle('D')">Re-spin (1)</button></span>
+        <div class="slot-machine-box"><div class="slot-reel" id="reelDecade"></div></div>
+    </div>
+</div>
+
+<div class="row"><button class="p" id="spinAll">Spin Slot Machines</button><button id="rst">Reset</button></div>
+<div class="msg" id="msg" role="status"></div>
+<div class="slots" id="slots"></div>
+<div class="ro" id="ro"></div>
+<div id="go"></div>
+
+</main>
+<script>
+const RAW=`Real Madrid|1950s|G:Alonso 78,Juanito 76;D:Santamaria 90,Marquitos 82,Lesmes 80;M:Zarraga 80,Rial 86,Munoz 80;F:Di Stefano 94,Gento 90,Kopa 91,Puskas 94
+Real Madrid|1960s|G:Araquistain 78,Vicente 76;D:Santamaria 88,Pachin 80,Miera 76,Sanchis 82;M:Amancio 84,Zoco 80,Pirri 82;F:Di Stefano 92,Gento 90,Puskas 92,Grosso 78
+Real Madrid|1990s|G:Buyo 80,Illgner 82,Canizares 82;D:Hierro 90,Sanchis 84,Roberto Carlos 88,Panucci 82;M:Redondo 90,Seedorf 86,Karembeu 80;F:Raul 92,Suker 87,Mijatovic 86,Morientes 85
+Real Madrid|2000s|G:Casillas 90,Cesar 78;D:Ramos 86,Helguera 82,Salgado 83,Roberto Carlos 91;M:Zidane 96,Makelele 88,Figo 91,Guti 84,Beckham 88;F:Raul 92,Ronaldo R9 94,Owen 84,Van Nistelrooy 90
+Real Madrid|2010s|G:Casillas 89,Courtois 90,Navas 88;D:Ramos 91,Pepe 88,Varane 89,Marcelo 88;M:Modric 91,Kroos 90,Casemiro 89,Kaka 84,Alonso 86;F:Ronaldo 95,Bale 90,Benzema 90
+Real Madrid|2020s|G:Courtois 92,Lunin 82;D:Militao 88,Alaba 86,Carvajal 88,Mendy 83,Rudiger 88;M:Modric 89,Kroos 88,Valverde 90,Camavinga 85,Tchouameni 86,Bellingham 92;F:Vinicius 92,Benzema 92,Rodrygo 86,Mbappe 94
+AC Milan|1980s|G:Galli 84,Tancredi 76;D:Baresi 93,Maldini 89,Tassotti 85,Costacurta 84;M:Ancelotti 86,Rijkaard 91,Donadoni 86,Colombo 80;F:Gullit 93,Van Basten 94,Virdis 82
+AC Milan|1990s|G:Rossi 82,Lehmann 78;D:Baresi 91,Maldini 94,Costacurta 86,Tassotti 84,Panucci 82;M:Albertini 88,Desailly 88,Savicevic 90,Boban 86;F:Papin 88,Weah 92,Massaro 82,Bierhoff 86
+AC Milan|2000s|G:Dida 86,Abbiati 80;D:Maldini 92,Nesta 92,Cafu 90,Stam 88,Jankulovski 82;M:Pirlo 90,Gattuso 88,Seedorf 88,Kaka 92,Ambrosini 82;F:Shevchenko 92,Inzaghi 88,Crespo 86,Ronaldinho 91
+AC Milan|2010s|G:Abbiati 80,Donnarumma 85;D:Thiago Silva 90,Nesta 86,Zambrotta 82,Mexes 81,Abate 79;M:Pirlo 89,Seedorf 84,Gattuso 81,Montolivo 82,Boateng 82;F:Ibrahimovic 91,Robinho 84,Pato 84,Cassano 84
+Bayern Munich|1970s|G:Maier 91;D:Beckenbauer 94,Schwarzenbeck 84,Breitner 88,Durnberger 78;M:Roth 82,Kapellmann 80,Zobel 82;F:Muller 94,Rummenigge 91,Hoeness 86
+Bayern Munich|1990s|G:Kahn 90,Aumann 78;D:Matthaus 91,Kuffour 84,Babbel 82,Helmer 82;M:Effenberg 89,Basler 84,Sforza 84,Scholl 85,Jeremies 80;F:Klinsmann 90,Elber 87,Zickler 80
+Bayern Munich|2000s|G:Kahn 92,Rensing 74;D:Lucio 89,Lahm 87,Kuffour 82,Linke 78,Sagnol 83;M:Ballack 90,Schweinsteiger 85,Hargreaves 82,Salihamidzic 83;F:Makaay 88,Pizarro 86,Toni 88,Ribery 90,Podolski 82
+Bayern Munich|2010s|G:Neuer 93,Butt 76;D:Lahm 90,Boateng 89,Alaba 87,Hummels 89;M:Schweinsteiger 90,Thiago 89,Vidal 88,Muller 88,Kroos 89;F:Ribery 91,Robben 91,Lewandowski 92,Gomez 87
+Bayern Munich|2020s|G:Neuer 90,Ulreich 76;D:Davies 86,Pavard 82,Upamecano 85,Kim 84;M:Kimmich 90,Goretzka 86,Musiala 90,Muller 86;F:Lewandowski 94,Kane 93,Sane 87,Coman 86,Gnabry 85
+Liverpool|1980s|G:Grobbelaar 85;D:Hansen 89,Lawrenson 86,Neal 84,Kennedy 82;M:Souness 90,Whelan 83,McMahon 81,Nicol 80;F:Dalglish 92,Rush 91,Johnston 80,Barnes 89
+Liverpool|2000s|G:Dudek 82,Reina 86;D:Carragher 86,Hyypia 86,Finnan 81,Riise 82,Agger 82;M:Gerrard 92,Alonso 88,Mascherano 86,Hamann 82;F:Owen 90,Torres 90,Kuyt 84,Crouch 81,Fowler 86
+Liverpool|2010s|G:Alisson 91,Mignolet 79;D:van Dijk 92,Robertson 86,Alexander-Arnold 87,Lovren 81,Matip 83;M:Henderson 84,Fabinho 87,Wijnaldum 85,Gerrard 88,Coutinho 87;F:Salah 92,Mane 90,Firmino 88,Sturridge 85
+Liverpool|2020s|G:Alisson 90,Kelleher 78;D:van Dijk 90,Konate 85,Alexander-Arnold 87,Robertson 85;M:Fabinho 85,Thiago 86,Szoboszlai 86,Mac Allister 87,Henderson 81;F:Salah 91,Nunez 83,Diaz 86,Jota 86,Gakpo 84
+Barcelona|1990s|G:Zubizarreta 86;D:Koeman 90,Nadal 83,Ferrer 82,Abelardo 82,Sergi 81;M:Guardiola 90,Amor 83,Figo 90,Luis Enrique 87;F:Romario 92,Stoichkov 92,Laudrup 90,Rivaldo 92,Kluivert 88
+Barcelona|2000s|G:Valdes 85;D:Puyol 91,Marquez 85,Abidal 84,Alves 88,Pique 86;M:Xavi 93,Iniesta 92,Busquets 86,Deco 89;F:Messi 95,Etoo 91,Henry 91,Ronaldinho 93,Larsson 87
+Barcelona|2010s|G:Ter Stegen 90,Valdes 84;D:Pique 89,Puyol 89,Alba 86,Alves 88,Mascherano 85;M:Xavi 94,Iniesta 94,Busquets 89,Rakitic 87;F:Messi 98,Suarez 92,Neymar 93,Villa 88
+Barcelona|2020s|G:Ter Stegen 89;D:Araujo 86,Kounde 86,Balde 82,Cubarsi 80,Inigo 82;M:Pedri 90,Gavi 85,De Jong 88,Busquets 84;F:Lewandowski 91,Raphinha 88,Yamal 91,Dembele 86,Messi 93
+Manchester United|1990s|G:Schmeichel 92;D:Irwin 85,Pallister 84,Bruce 84,Stam 90,Neville 83,Johnsen 81;M:Keane 90,Scholes 88,Giggs 90,Beckham 89,Butt 81;F:Cantona 92,Cole 88,Yorke 89,Solskjaer 86,Sheringham 86
+Manchester United|2000s|G:Van der Sar 90,Howard 80;D:Ferdinand 90,Vidic 90,Evra 86,Neville 85,Brown 80;M:Scholes 90,Giggs 89,Carrick 85,Keane 89;F:Rooney 90,Ronaldo 93,Van Nistelrooy 91,Tevez 87
+Manchester United|2010s|G:De Gea 91,Van der Sar 86;D:Ferdinand 86,Vidic 87,Evra 83,Smalling 80;M:Carrick 85,Scholes 84,Fellaini 80,Pogba 88,Herrera 82;F:Rooney 89,Berbatov 87,Chicharito 82,Martial 83,Rashford 84
+Juventus|1990s|G:Peruzzi 88;D:Ferrara 86,Montero 85,Torricelli 82,Pessotto 80,Iuliano 82;M:Deschamps 87,Davids 87,Conte 84,Zidane 93;F:Del Piero 92,Vialli 89,Ravanelli 87,Inzaghi 86,Boksic 84
+Juventus|2000s|G:Buffon 93,Chimenti 74;D:Thuram 89,Cannavaro 91,Zambrotta 87,Legrottaglie 79;M:Nedved 92,Davids 86,Camoranesi 84,Vieira 88,Emerson 86;F:Del Piero 90,Trezeguet 89,Ibrahimovic 89
+Juventus|2010s|G:Buffon 91,Szczesny 85;D:Chiellini 89,Bonucci 88,Barzagli 87,Alves 85,Lichtsteiner 82;M:Pirlo 91,Vidal 88,Pogba 89,Marchisio 86,Khedira 84;F:Tevez 89,Dybala 88,Higuain 89,Ronaldo 93,Mandzukic 85
+Inter Milan|2000s|G:Julio Cesar 89,Toldo 84;D:Zanetti 92,Lucio 89,Maicon 90,Samuel 88,Materazzi 85,Chivu 84;M:Cambiasso 87,Stankovic 85,Sneijder 90,Veron 86;F:Ibrahimovic 91,Etoo 90,Milito 90,Adriano 89,Vieri 90
+Inter Milan|2010s|G:Handanovic 88,Julio Cesar 86;D:Zanetti 88,Maicon 88,Skriniar 86,Samuel 85,Miranda 84,Bastoni 85;M:Sneijder 89,Brozovic 86,Barella 87,Cambiasso 86;F:Etoo 91,Milito 89,Icardi 87,Lautaro 88,Perisic 84
+Ajax|1970s|G:Stuy 78;D:Krol 89,Hulshoff 84,Suurbier 83,Blankenburg 80;M:Neeskens 90,Haan 87,Muhren 84;F:Cruyff 94,Rep 87,Keizer 86,Swart 84
+Ajax|1990s|G:Van der Sar 90;D:Blind 88,F de Boer 87,Reiziger 82,Bogarde 82;M:Davids 88,Seedorf 87,Litmanen 90,R de Boer 86;F:Kluivert 88,Overmars 89,Kanu 85,Finidi 85
+Chelsea|2000s|G:Cech 91,Cudicini 82;D:Terry 90,Carvalho 88,Cole 89,Ferreira 83,Gallas 86;M:Lampard 91,Makelele 88,Essien 88,Ballack 88,Joe Cole 85;F:Drogba 91,Duff 83,Robben 88,Crespo 86
+Chelsea|2010s|G:Cech 88,Courtois 90;D:Terry 87,Ivanovic 85,Azpilicueta 86,Cahill 83,David Luiz 85;M:Lampard 88,Kante 90,Mata 87,Oscar 84,Fabregas 88;F:Drogba 89,Hazard 92,Costa 88,Torres 84,Willian 85
+Paris Saint-Germain|2010s|G:Sirigu 83,Trapp 82;D:Thiago Silva 90,Marquinhos 87,Alves 85,Maxwell 83,Kimpembe 83;M:Verratti 89,Motta 84,Matuidi 86,Rabiot 83;F:Ibrahimovic 92,Cavani 90,Neymar 93,Mbappe 91,Di Maria 89,Pastore 85
+Paris Saint-Germain|2020s|G:Navas 87,Donnarumma 88;D:Marquinhos 88,Hakimi 87,Kimpembe 83,Ramos 85,Mendes 84;M:Verratti 88,Vitinha 86,Ruiz 83,Zaire-Emery 83;F:Messi 93,Neymar 91,Mbappe 93,Dembele 87,Kvaratskhelia 88
+Borussia Dortmund|2010s|G:Weidenfeller 83,Burki 84;D:Hummels 89,Subotic 83,Piszczek 85,Schmelzer 82,Sokratis 84;M:Gundogan 87,Kagawa 86,Bender 82,Reus 89;F:Lewandowski 91,Aubameyang 89,Gotze 87,Dembele 86,Sancho 87
+Arsenal|2000s|G:Lehmann 86,Almunia 80;D:Campbell 88,Toure 86,Cole 89,Lauren 84,Clichy 82;M:Vieira 91,Gilberto 85,Fabregas 88,Ljungberg 86,Pires 89,Rosicky 85;F:Henry 94,Bergkamp 92,Reyes 84,Adebayor 85
+Arsenal|2010s|G:Szczesny 84,Cech 86;D:Koscielny 86,Mertesacker 83,Sagna 83,Monreal 82,Bellerin 82;M:Cazorla 87,Ozil 90,Ramsey 85,Wilshere 83,Xhaka 82;F:Sanchez 89,Walcott 84,Giroud 85,Welbeck 80,Lacazette 85
+Manchester City|2010s|G:Hart 86,Ederson 88;D:Kompany 90,Zabaleta 85,Kolarov 83,Stones 85,Walker 86,Laporte 87;M:Yaya Toure 90,Silva 90,De Bruyne 92,Fernandinho 87,Gundogan 86;F:Aguero 91,Sterling 88,Mahrez 87,Jesus 85,Sane 86
+Manchester City|2020s|G:Ederson 90,Ortega 78;D:Dias 90,Stones 87,Walker 86,Cancelo 87,Akanji 86,Gvardiol 87;M:Rodri 92,De Bruyne 93,Foden 89,Gundogan 86;F:Haaland 93,Grealish 86,Mahrez 86,Alvarez 86,Doku 85
+Atletico Madrid|2010s|G:Courtois 88,Oblak 91;D:Godin 90,Juanfran 85,Filipe Luis 86,Miranda 85,Gimenez 85;M:Gabi 85,Koke 87,Saul 85,Turan 84;F:Griezmann 91,Costa 88,Falcao 90,Torres 85,Mandzukic 85`;
+
+const $=i=>document.getElementById(i);
+const mb=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const sub=(s,k)=>mb(Math.imul(s^Math.imul(k,2654435761),2246822519)>>>0);
+const gauss=r=>Math.sqrt(-2*Math.log(1-r()))*Math.cos(6.2831853*r());
+const sg=(a,d,b)=>1/(1+Math.exp(-(.045*(a-d)+b)));
+const cl=(x,l,h)=>Math.max(l,Math.min(h,x));
+
+const FLEX={Ronaldo:"M",Messi:"M",Neymar:"M",Bale:"M","Di Stefano":"M",Puskas:"M",Cruyff:"M",Hoeness:"M",Muller:"MF",Kaka:"MF",Zidane:"MF",Ronaldinho:"M",Rivaldo:"M",Gerrard:"DF",Lahm:"M",Alves:"M","Roberto Carlos":"M",Alaba:"M","Alexander-Arnold":"M",Kimmich:"D",Fabinho:"D",Rodri:"D",Busquets:"D",Matthaus:"M",Beckenbauer:"M",Baresi:"M",Hierro:"M",Ramos:"M",Rijkaard:"D",Desailly:"D",Makelele:"D",Vieira:"D",Valverde:"DF",Sane:"M",Salah:"M","De Bruyne":"F",Foden:"F",Bellingham:"F",Musiala:"F",Ibrahimovic:"M",Griezmann:"M",Hazard:"M",Dembele:"M",Raphinha:"M",Yamal:"M",Iniesta:"F",Mbappe:"M",Vinicius:"M",Kane:"M",Henry:"M",Giggs:"F",Beckham:"F",Scholes:"F",Figo:"F",Pedri:"F",Gundogan:"F",Silva:"F",Mahrez:"M",Sterling:"M",Coutinho:"F",Mata:"F",Ozil:"F",Odegaard:"F",Saka:"M",Palmer:"M",Cantona:"M",Bergkamp:"M",Maldini:"M",Cafu:"M",Casemiro:"D",Carrick:"D","Yaya Toure":"DF",Neeskens:"D",Overmars:"M",Rummenigge:"M",Robben:"M",Ribery:"M"};
+const hv=(s,i)=>{let h=i*977;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)%11-5};
+
+function mk(n,q,pri){
+ const sec=(FLEX[n]||"").replace(pri,""),a={};
+ if(pri==="G"){
+     a.pos=cl(q+hv(n,1),20,99);
+     a.han=cl(q-2+hv(n,2),20,99);
+     a.ref=cl(q+2+hv(n,3),20,99);
+ } else {
+     a.def=cl(q+(pri==="D"?2:-10)+hv(n,1),20,99);
+     a.phy=cl(q+(pri==="D"?1:-8)+hv(n,2),20,99);
+     a.dri=cl(q+(pri==="M"?2:pri==="F"?1:-6)+hv(n,3),20,99);
+     a.pas=cl(q+(pri==="M"?2:-6)+hv(n,4),20,99);
+     a.sho=cl(q+(pri==="F"?3:pri==="M"?-2:-12)+hv(n,5),20,99);
+     a.pac=cl(q+(pri==="F"?2:pri==="D"?-2:-4)+hv(n,6),20,99);
+ }
+ const ovr = q; 
+ return{n,pri,sec,a,ovr}
+}
+
+const SN={G:"GK",D:"DEF",M:"MID",F:"FWD"};
+function role(p,s){
+ const a=p.a,o={n:p.n,pos:s,a,pri:p.pri,sec:p.sec,ovr:p.ovr};
+ if(s==="GK")return Object.assign(o,{d:30,s:20,f:(a.ref||75)*.6+(a.han||75)*.3+(a.pos||75)*.1});
+ if(s==="DEF")return Object.assign(o,{d:(a.pac||75),s:60,f:(a.def||75)*.7+(a.phy||75)*.3});
+ if(s==="MID")return Object.assign(o,{d:(a.pas||75)*.5+(a.dri||75)*.5,s:(a.sho||75),f:(a.dri||75)*.5+(a.pas||75)*.5});
+ return Object.assign(o,{d:(a.dri||75)*.7+(a.pac||75)*.3,s:(a.sho||75)*.8+(a.pac||75)*.2,f:(a.sho||75)*.6+(a.dri||75)*.4});
+}
+
+const POOLS=RAW.split("\n").map(l=>{const[c,d,r]=l.split("|"),p=[];
+ r.split(";").forEach(g=>g.slice(2).split(",").forEach(x=>{const k=x.lastIndexOf(" ");p.push(mk(x.slice(0,k),+x.slice(k+1),g[0]))}));
+ return{n:c+" "+d,c,d,p}});
+const TEAMS = [...new Set(POOLS.map(x=>x.c))];
+const DECADES = [...new Set(POOLS.map(x=>x.d))];
+
+const CUR=`Real Madrid|Courtois 90,Carvajal 86,Militao 86,Rudiger 88,Mendy 83,Tchouameni 85,Valverde 89,Bellingham 91,Rodrygo 86,Vinicius 91,Mbappe 92
+Barcelona|Ter Stegen 89,Kounde 85,Araujo 86,Cubarsi 80,Balde 82,Pedri 89,De Jong 87,Gavi 84,Raphinha 87,Lewandowski 89,Yamal 90
+Manchester City|Ederson 88,Walker 85,Dias 89,Stones 86,Gvardiol 86,Rodri 91,De Bruyne 91,Foden 88,Silva 88,Haaland 91,Doku 85
+Liverpool|Alisson 90,Alexander-Arnold 86,Konate 84,Van Dijk 89,Robertson 85,Mac Allister 87,Szoboszlai 86,Gravenberch 83,Salah 90,Nunez 84,Diaz 86
+Arsenal|Raya 88,White 85,Saliba 89,Gabriel 87,Timber 83,Rice 88,Odegaard 89,Merino 84,Saka 89,Havertz 85,Martinelli 84
+Bayern Munich|Neuer 88,Kimmich 88,Upamecano 85,Kim 84,Davies 85,Palhinha 85,Goretzka 84,Musiala 89,Sane 86,Kane 91,Gnabry 84
+Paris Saint-Germain|Donnarumma 88,Hakimi 86,Marquinhos 87,Pacho 82,Mendes 84,Vitinha 88,Neves 86,Zaire-Emery 83,Dembele 87,Ramos 84,Barcola 84
+Inter Milan|Sommer 87,Pavard 84,Acerbi 83,Bastoni 87,Dimarco 86,Barella 87,Calhanoglu 87,Mkhitaryan 83,Thuram 85,Martinez 89,Dumfries 83
+Atletico Madrid|Oblak 89,Molina 82,Gimenez 85,Le Normand 84,Lino 83,De Paul 85,Koke 84,Gallagher 83,Griezmann 88,Alvarez 87,Sorloth 84
+Chelsea|Sanchez 80,James 84,Fofana 82,Colwill 82,Cucurella 82,Enzo 85,Caicedo 85,Palmer 88,Madueke 81,Jackson 82,Neto 83
+Juventus|Di Gregorio 82,Cambiaso 82,Bremer 85,Gatti 81,Cabal 79,Locatelli 82,Koopmeiners 84,Luiz 83,Gonzalez 82,Vlahovic 85,Yildiz 82`.split("\n").map(l=>{const[n,r]=l.split("|"),x=r.split(",").map(s=>{const k=s.lastIndexOf(" ");return[s.slice(0,k),+s.slice(k+1)]}),p="GDDDDMMMFFF";
+ const q=x.map((y,i)=>role(mk(y[0],y[1],p[i]),SN[p[i]]));return{n:n,sig:.15,L:{gk:q[0],df:q.slice(1,5),mid:q.slice(5,8),fw:q.slice(8,11)}}});
+
+const FORMATIONS = {
+    "4-3-3": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "FWD", "FWD", "FWD"],
+    "4-4-2": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "FWD", "FWD"],
+    "4-1-4-1": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "MID", "FWD"],
+    "3-5-2": ["GK", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "MID", "FWD", "FWD"],
+    "3-4-3": ["GK", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "FWD", "FWD", "FWD"],
+    "4-2-4": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "FWD", "FWD", "FWD", "FWD"]
+};
+
+let currentFormation = "4-3-3";
+let K = FORMATIONS[currentFormation];
+const LT={GK:"G",DEF:"D",MID:"M",FWD:"F"};
+const AT={
+    GK:[["pos","POS"],["han","HAN"],["ref","REF"]],
+    DEF:[["def","DEF"],["phy","PHY"]],
+    MID:[["dri","DRI"],["pas","PAS"],["sho","SHO"]],
+    FWD:[["pac","PAC"],["sho","SHO"],["dri","DRI"]]
+};
+
+let seed=Math.floor(Math.random()*1e6),spinN=0;
+let cur=null;
+let busy=false, tn=0, S=Array(11).fill(null);
+let rsT = 1;
+let rsD = 1;
+
+const used=()=>new Set(S.filter(Boolean).map(p=>p.n));
+const open=pos=>K.map((k,i)=>k===pos&&!S[i]?i:-1).filter(i=>i>=0);
+const elig=(p,g)=>p.pri===LT[g]||p.sec.includes(LT[g]);
+
+$("formationSelect").onchange = (e) => {
+    if(S.some(Boolean)) {
+        alert("Cannot change formation while drafting players! Please reset.");
+        e.target.value = currentFormation;
+        return;
+    }
+    currentFormation = e.target.value;
+    K = FORMATIONS[currentFormation];
+    S = Array(11).fill(null);
+    slots();
+};
+
+function setupSlotReels() {
+    initReel("reelTeam", TEAMS, TEAMS[0]);
+    initReel("reelDecade", DECADES, DECADES[0]);
+}
+
+function initReel(id, items, selectedVal) {
+    const el = $(id);
+    let html = "";
+    let list = [...items, ...items, ...items, ...items];
+    list.forEach(item => {
+        html += `<div class="slot-item">${item}</div>`;
+    });
+    el.innerHTML = html;
+    const idx = items.indexOf(selectedVal);
+    el.style.transition = "none";
+    el.style.transform = `translateY(-${idx * 70}px)`;
+}
+
+function spinReel(id, items, targetVal) {
+    const el = $(id);
+    let html = "";
+    let list = [];
+    for(let i=0; i<6; i++) list = list.concat(items);
+    list.forEach(item => {
+        html += `<div class="slot-item">${item}</div>`;
+    });
+    el.innerHTML = html;
+    
+    el.style.transition = "none";
+    el.style.transform = `translateY(0px)`;
+    
+    setTimeout(() => {
+        const targetIdx = items.indexOf(targetVal);
+        const finalOffset = ((items.length * 4) + targetIdx) * 70;
+        el.style.transition = "transform 3.5s cubic-bezier(0.1, 0.9, 0.1, 1)";
+        el.style.transform = `translateY(-${finalOffset}px)`;
+    }, 50);
+}
+
+function slots(){
+    let fwdIndices = [], midIndices = [], defIndices = [], gkIndices = [];
+    K.forEach((pos, idx) => {
+        if(pos === "FWD") fwdIndices.push(idx);
+        else if(pos === "MID") midIndices.push(idx);
+        else if(pos === "DEF") defIndices.push(idx);
+        else if(pos === "GK") gkIndices.push(idx);
+    });
+
+    const renderRow = (indices) => {
+        return `<div class="field-row">` + indices.map(i => {
+            const p = S[i];
+            if(!p) return `<div class='slot' ondragover="allowDrop(event)" ondrop="drop(event, ${i})"><b>${K[i]}</b></div>`;
+            return `<div class='slot f' draggable="true" ondragstart="drag(event, ${i})" ondragover="allowDrop(event)" ondrop="drop(event, ${i})">
+                <b>${K[i]}</b>
+                <span style="font-size:11px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;">${p.n}</span>
+                <span class="ovr-badge">${p.ovr}</span>
+            </div>`;
+        }).join("") + `</div>`;
+    };
+
+    $("slots").innerHTML = `
+        <div class="field-view">
+            ${fwdIndices.length ? renderRow(fwdIndices) : ''}
+            ${midIndices.length ? renderRow(midIndices) : ''}
+            ${defIndices.length ? renderRow(defIndices) : ''}
+            ${gkIndices.length ? renderRow(gkIndices) : ''}
+        </div>
+    `;
+}
+
+function drag(ev, index) {
+    ev.dataTransfer.setData("text/plain", index);
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drop(ev, targetIndex) {
+    ev.preventDefault();
+    const sourceIndex = parseInt(ev.dataTransfer.getData("text/plain"));
+    if (isNaN(sourceIndex) || sourceIndex === targetIndex) return;
+
+    const p = S[sourceIndex];
+    if (!p) return;
+
+    const targetPosType = K[targetIndex];
+    if (elig(p, targetPosType)) {
+        const targetPlayer = S[targetIndex];
+        S[targetIndex] = role(p, targetPosType);
+        S[targetIndex].pri = p.pri;
+        S[targetIndex].sec = p.sec;
+        S[targetIndex].ovr = p.ovr;
+
+        if (targetPlayer) {
+            const sourcePosType = K[sourceIndex];
+            if (elig(targetPlayer, sourcePosType)) {
+                S[sourceIndex] = role(targetPlayer, sourcePosType);
+                S[sourceIndex].pri = targetPlayer.pri;
+                S[sourceIndex].sec = targetPlayer.sec;
+                S[sourceIndex].ovr = targetPlayer.ovr;
+            } else {
+                S[sourceIndex] = null;
+                let openIdx = K.findIndex((k, idx) => !S[idx] && elig(targetPlayer, k));
+                if (openIdx !== -1) {
+                    S[openIdx] = role(targetPlayer, K[openIdx]);
+                    S[openIdx].pri = targetPlayer.pri;
+                    S[openIdx].sec = targetPlayer.sec;
+                    S[openIdx].ovr = targetPlayer.ovr;
+                }
+            }
+        } else {
+            S[sourceIndex] = null;
+        }
+        slots();
+        if (cur) roster();
+    } else {
+        alert("Player is not eligible for this position!");
+    }
+}
+
+function roster(){
+ if(!cur){$("ro").innerHTML="";return}
+ const u=used();let any=false;
+ let h=`<div class='msg big'>${cur.c} · ${cur.d}</div>`;
+ ["GK","DEF","MID","FWD"].forEach(g=>{
+  const ps=cur.p.filter(p=> p.pri === LT[g]);
+  const o=open(g).length>0;
+  h+="<h3>"+g+(o?"":" (Full)")+"</h3><div class='pk'>"+ps.map(p=>{
+   const ok=o&&!u.has(p.n);if(ok)any=true;
+   const tag=p.pri==="G"?"":[SN[p.pri],...[...p.sec].map(x=>SN[x])].join("/");
+   return"<button data-n='"+p.n.replace(/'/g,"&#39;")+"' data-p='"+g+"'"+(ok?"":" disabled")+">"+p.n+" (OVR: "+p.ovr+")<small>"+AT[g].map(([k,l])=>l+" "+p.a[k]).join(" · ")+(tag.includes("/")?" · "+tag:"")+"</small></button>"
+  }).join("")+"</div>";
+ });
+ $("ro").innerHTML=h;
+ if(!any){$("msg").textContent="No eligible player in this pool. Spin again.";}
+ else document.querySelectorAll(".pk button:not(:disabled)").forEach(b=>b.onclick=()=>choose(b.dataset.n,b.dataset.p))
+}
+
+function choose(n,g){
+ const p=cur.p.find(x=>x.n===n),i=open(g)[0];S[i]=role(p,g);S[i].ovr=p.ovr;cur=null;
+ $("spinAll").style.display='inline-block'; slots(); roster();
+ if(S.every(Boolean)){
+    const totalOvr = S.reduce((sum, player) => sum + player.ovr, 0);
+    const calculatedTeamOvr = Math.min(99, Math.round(totalOvr / 10.5));
+    
+    $("msg").innerHTML = `Lineup locked successfully! 🏆 <span class='team-rating'>Team OVR: ${calculatedTeamOvr}</span>`;
+    $("spinAll").style.display='none';
+    $("go").innerHTML="<div class='row'><button class='p' id='play'>Start Champions League</button></div>";
+    $("play").onclick=tour;
+ } else {
+    $("msg").textContent="Selected "+n+". Spin slot machines for your next player.";
+ }
+}
+
+function spinBoth() {
+    if(busy||S.every(Boolean))return; busy=true; $("msg").textContent=""; $("ro").innerHTML="";
+    
+    let pool, curT, curD;
+    do {
+        curT = TEAMS[Math.floor(sub(seed, 100 + spinN++)() * TEAMS.length)];
+        curD = DECADES[Math.floor(sub(seed, 200 + spinN++)() * DECADES.length)];
+        pool = POOLS.find(p => p.c === curT && p.d === curD);
+    } while (!pool);
+
+    cur = pool;
+    spinReel("reelTeam", TEAMS, curT);
+    spinReel("reelDecade", DECADES, curD);
+
+    setTimeout(()=>{
+        busy=false;
+        roster();
+    }, 3600);
+}
+
+function respinSingle(type) {
+    if(busy || S.every(Boolean)) return;
+    if(type === 'T' && rsT <= 0) { alert("Team Re-spin already used!"); return; }
+    if(type === 'D' && rsD <= 0) { alert("Decade Re-spin already used!"); return; }
+    
+    if(type === 'T') { rsT--; $("respinTeamBtn").disabled = true; $("respinTeamBtn").textContent = "Re-spin (0)"; }
+    if(type === 'D') { rsD--; $("respinDecadeBtn").disabled = true; $("respinDecadeBtn").textContent = "Re-spin (0)"; }
+
+    busy=true; $("msg").textContent=""; $("ro").innerHTML="";
+    
+    let pool, curT, curD;
+    do {
+        curT = TEAMS[Math.floor(sub(seed, 300 + spinN++)() * TEAMS.length)];
+        curD = DECADES[Math.floor(sub(seed, 400 + spinN++)() * DECADES.length)];
+        pool = POOLS.find(p => p.c === curT && p.d === curD);
+    } while (!pool);
+
+    cur = pool;
+    if(type === 'T') {
+        spinReel("reelTeam", TEAMS, curT);
+    } else {
+        spinReel("reelDecade", DECADES, curD);
+    }
+
+    setTimeout(()=>{
+        busy=false;
+        roster();
+    }, 3600);
+}
+
+$("spinAll").onclick = () => { spinBoth(); };
+
+$("rst").onclick=()=>{
+    seed=Math.floor(Math.random()*1e6);spinN=0;tn=0;cur=null;
+    rsT=1; rsD=1;
+    $("respinTeamBtn").disabled = false; $("respinTeamBtn").textContent = "Re-spin (1)";
+    $("respinDecadeBtn").disabled = false; $("respinDecadeBtn").textContent = "Re-spin (1)";
+    S=Array(11).fill(null);
+    $("spinAll").style.display='inline-block'; $("spinAll").disabled=false;$("go").innerHTML="";$("msg").textContent="";
+    setupSlotReels();
+    slots();
+    roster();
+};
+
+const avg = (arr, prop) => arr.reduce((sum, p) => sum + p[prop], 0) / arr.length;
+function wpick(a,w,r){let t=0;const ws=a.map(w);ws.forEach(x=>t+=x);let u=r()*t;for(let i=0;i<a.length;i++){u-=ws[i];if(u<=0)return a[i]}return a[a.length-1]}
+function sim(HP,AP,LH,LA,seed,log, teamOvrBoost){
+ const re=sub(seed,1),chaos=Math.exp(gauss(sub(seed,3))*(HP.sig+AP.sig)/2),SS=[LH,LA].map(L=>({L,g:0,s:0,xg:0,p:0,m:0})),ev=[];
+ const mean=30/80;let t=0,last=0;
+ const mid=L=>avg(L.mid,'d'), dv=L=>.4*avg(L.df,'f')+.25*avg(L.mid,'f')+.1*avg(L.fw,'f'), outL=L=>[...L.df, ...L.mid, ...L.fw];
+ while(true){
+  t+=-Math.log(1-re())*mean;if(t>30)break;
+  const dt=t-last;last=t;SS.forEach(x=>x.m*=Math.pow(.95,dt));
+  const i=re()<sg(mid(SS[0].L)*.6,mid(SS[1].L)*.6,SS[0].m-SS[1].m)?0:1,A=SS[i],D=SS[1-i];A.p++;
+  const mo=cl(A.m,-.15,.15);
+  
+  const boost = (i === 0) ? teamOvrBoost : 1.0;
+
+  if(re()>=sg(mid(A.L)*boost,dv(D.L),-.3+mo))continue;
+  const car=wpick(outL(A.L),x=>x.d*x.d*(x.pos==="MID"?1.3:1),re),dfn=wpick(outL(D.L),x=>x.f*x.f,re);
+  if(re()>=sg(car.d,dfn.f*.9,.3+mo))continue;
+  const sh=re()<.5?car:wpick(outL(A.L),x=>x.s*x.s,re),u=re(),x=.06+.6*u*u;A.s++;A.xg+=x;
+  const km=1-(D.L.gk.f-75)/90,pg=cl(x*(sh.s/75)*km*chaos*boost,.02,.9);let o;
+  if(re()<pg){o="goal";A.g++;A.m=cl(A.m+.08,-.15,.15);D.m=cl(D.m-.04,-.15,.15)}
+  else{const w=re();o=w<.5?"saved":w<.75?"blocked":"off target"}
+  if(log)ev.push({t:+t.toFixed(1),team:i?"away":"home",shooter:sh.n,pos:sh.pos,long_range:sh.pos!=="FWD",xg:+x.toFixed(2),outcome:o});
+ }
+ const tp=SS[0].p+SS[1].p||1,p0=Math.round(100*SS[0].p/tp);
+ return{g:[SS[0].g,SS[1].g],s:[SS[0].s,SS[1].s],xg:[SS[0].xg,SS[1].xg],pos:[p0,100-p0],ev,chaos}}
+
+function tour(){
+ const dfCount = K.filter(x=>x==="DEF").length;
+ const midCount = K.filter(x=>x==="MID").length;
+ const fwCount = K.filter(x=>x==="FWD").length;
+ 
+ const L={
+  gk:S[0],
+  df:S.slice(1, 1 + dfCount),
+  mid:S.slice(1 + dfCount, 1 + dfCount + midCount),
+  fw:S.slice(1 + dfCount + midCount, 11)
+ };
+
+ const totalOvr = S.reduce((sum, player) => sum + player.ovr, 0);
+ const teamAvgOvr = totalOvr / 10.5;
+ const teamOvrBoost = teamAvgOvr >= 91 ? 1.15 : 1.0;
+
+ const MY={sig:.15,n:"Your XI"},b=seed+tn*1000,r=sub(b,500);let k=0,out="";
+ const M=(h,a,lh,la)=>sim(h,a,lh,la,b*7+(k++),false, teamOvrBoost);
+ const pool=CUR.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+ const T=[{P:MY,L,pt:0,gf:0,ga:0},...pool.slice(0,3).map(P=>({P,L:P.L,pt:0,gf:0,ga:0}))];
+ const add=(x,y,gx,gy)=>{x.gf+=gx;x.ga+=gy;y.gf+=gy;y.ga+=gx;if(gx>gy)x.pt+=3;else if(gx<gy)y.pt+=3;else{x.pt++;y.pt++}};
+ let rows="";
+ for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)for(let leg=0;leg<2;leg++){const[x,y]=leg?[T[j],T[i]]:[T[i],T[j]],R=M(x.P,y.P,x.L,y.L);add(x,y,R.g[0],R.g[1]);
+  if(i===0)rows+="<li><span class='m'>Group</span><span>vs "+T[j].P.n+" ("+(leg?"Away":"Home")+") — <span class='sc'>"+(leg?R.g[1]+"–"+R.g[0]:R.g[0]+"–"+R.g[1])+"</span></span></li>"}
+ const ord=T.map((t,i)=>i).sort((p,q)=>T[q].pt-T[p].pt||(T[q].gf-T[q].ga)-(T[p].gf-T[p].ga)||T[q].gf-T[q].gf),pos=ord.indexOf(0)+1;
+ out+="<h3>Group Table</h3><table class='tb'>"+ord.map((i,n)=>"<tr"+(i===0?" class='me'":"")+"><td>"+(n+1)+"</td><td>"+T[i].P.n+"</td><td class='sc'>"+T[i].gf+"-"+T[i].ga+"</td><td><b>"+T[i].pt+"</b></td></tr>").join("")+"</table><details><summary>Group Matches</summary><ol>"+rows+"</ol></details>";
+ let msg="";
+ if(pos>2)msg="Knocked out in the group stage (finished "+pos+(pos===3?"rd":"th")+").";
+ else{const RN=["Round of 16","Quarter-final","Semi-final","Final"];let ok=true,ko="";
+  for(let q=0;q<4&&ok;q++){const op=pool[3+q],R=M(MY,op,L,op.L);let w=R.g[0]>R.g[1],note="";
+   if(R.g[0]===R.g[1]){w=sub(b,900+q)()<cl(.5+(L.gk.f-op.L.gk.f)/200,.3,.7);note=" (Penalties)"}
+   ko+="<li><span class='m'>"+RN[q]+"</span><span>vs "+op.n+" — <span class='sc'>"+R.g[0]+"–"+R.g[1]+"</span>"+note+" — "+(w?"Through":"Out")+"</span></li>";
+   if(!w){ok=false;msg="Knocked out in the "+RN[q]+"."}}
+  out+="<h3>Knockout Stage</h3><ol>"+ko+"</ol>";if(ok)msg="🏆 Champions League Winners!"}
+ $("go").innerHTML="<div class='msg big'>"+msg+"</div>"+out+"<div class='row'><button class='p' id='again'>Replay with same lineup</button><button id='nw'>New draft</button></div>";
+ $("again").onclick=()=>{tn++;tour()};$("nw").onclick=()=>$("rst").onclick()}
+
+setupSlotReels(); slots();
+</script></body></html>
